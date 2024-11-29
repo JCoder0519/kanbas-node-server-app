@@ -1,28 +1,38 @@
-// dao.js for enrollments
-import Database from "../Database/index.js";
+import model from "./model.js";
+import mongoose from "mongoose";
 
-export function createEnrollment(enrollment) {
-  const newEnrollment = { ...enrollment, _id: Date.now().toString() };
-  Database.enrollments = [...Database.enrollments, newEnrollment];
-  return newEnrollment;
+
+export async function findCoursesForUser(userId) {
+ const enrollments = await model.find({ user: userId }).populate("course");
+ return enrollments.map((enrollment) => enrollment.course);
 }
 
-export function deleteEnrollment(enrollmentId) {
-  const { enrollments } = Database;
-  Database.enrollments = enrollments.filter(
-    (enrollment) => enrollment._id !== enrollmentId
-  );
+export async function findUsersForCourse(courseId) {
+ const enrollments = await model.find({ course: courseId }).populate("user");
+ return enrollments.map((enrollment) => enrollment.user);
 }
 
-export function findEnrollmentsForUser(userId) {
-  const { enrollments } = Database;
-  return enrollments.filter((enrollment) => enrollment.user === userId);
+export async function enrollUserInCourse(userId, courseId) {
+  // Validate and convert IDs
+  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(courseId)) {
+    throw new Error("Invalid user or course ID");
+  }
+
+  return model.create({
+    user: new mongoose.Types.ObjectId(userId), // Correct usage of ObjectId
+    course: new mongoose.Types.ObjectId(courseId), // Correct usage of ObjectId
+    enrollmentDate: new Date(),
+  });
 }
 
-export function findEnrollment(userId, courseId) {
-  const { enrollments } = Database;
-  return enrollments.find(
-    (enrollment) =>
-      enrollment.user === userId && enrollment.course === courseId
-  );
+ export function unenrollUserFromCourse(user, course) {
+  return model.deleteOne({ user, course });
+ }
+ 
+
+export async function findEnrollment(userId, courseId) {
+  const enrollment = await model.findOne({ user: userId, course: courseId });
+  return enrollment;
 }
+
+
