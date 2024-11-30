@@ -1,65 +1,61 @@
-// const express = require("express");
-import mongoose from "mongoose";
-import "dotenv/config";
-import session from "express-session";
-import express from "express";
-import Hello from "./hello.js";
+import express from 'express';
+import Hello from "./Hello.js"
 import Lab5 from "./Lab5/index.js";
-import PathParameters from "./Lab5/PathParameters.js";
-import QueryParameters from "./Lab5/QueryParameters.js";
-import WorkingWithObjects from "./Lab5/WorkingWithObjects.js";
-import WorkingWithArrays from "./Lab5/WorkingWithArrays.js";
+import cors from "cors";
 import UserRoutes from "./Kanbas/Users/routes.js";
 import CourseRoutes from "./Kanbas/Courses/routes.js";
-import cors from "cors";
-import EnrollmentRoutes from "./Kanbas/Enrollments/routes.js";
-
-
+import ModuleRoutes from "./Kanbas/Modules/routes.js";
+import EnrollmentRoutes from "./Kanbas/Enrollments/routes.js"
+import session from "express-session";
+import "dotenv/config";
+import AssignmentRoutes from './Kanbas/Assignments/routes.js';
+import QuizRoutes from "./Kanbas/Quizzes/routes.js"
+import mongoose from "mongoose";
+import "dotenv/config";
+import QuestionsRoute from './Kanbas/QuizQuestions/routes.js';
 
 const CONNECTION_STRING = "mongodb://127.0.0.1:27017/kanbas-02-fa24";
 mongoose.connect(CONNECTION_STRING);
 
-
 const app = express();
 app.use(
-  cors({
-    credentials: true,
-    origin: process.env.NETLIFY_URL || "http://localhost:3000",
-  })
+    cors({
+        credentials: true,
+        origin: process.env.NETLIFY_URL || "http://localhost:3000",
+        // origin: "http://localhost:3000",
+    })
 );
 const sessionOptions = {
-  secret: process.env.SESSION_SECRET || "kanbas",
-  resave: false,
-  saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || "kanbas",
+    resave: false,
+    saveUninitialized: false,
 };
 if (process.env.NODE_ENV !== "development") {
-  sessionOptions.proxy = true;
-  sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-    domain: process.env.NODE_SERVER_DOMAIN,
-  };
+    sessionOptions.proxy = true;
+    sessionOptions.cookie = {
+        sameSite: "none", //was lax -none
+        secure: true, //was false -true
+        // domain: process.env.NODE_SERVER_DOMAIN,
+    };
 }
-
-
-
 app.use(session(sessionOptions));
 app.use(express.json());
-
-Hello(app);
-Lab5(app);
-PathParameters(app);
-QueryParameters(app);
-WorkingWithObjects(app);
-WorkingWithArrays(app);
+// Code to test and display session variables for Render:
+// app.use((req, res, next) => {
+//     req.session.save((err) => {
+//         if (err) console.error('Session save error:', err);
+//         else console.log('Session saved successfully:', req.session);
+//     });
+//     next();
+// });
 UserRoutes(app);
 CourseRoutes(app);
+AssignmentRoutes(app);
 EnrollmentRoutes(app);
-
-
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-
+ModuleRoutes(app);
+QuizRoutes(app);
+QuestionsRoute(app);
+Lab5(app);
+Hello(app)
+app.listen(process.env.PORT || 4000);
+console.log(`Server is running on port ${process.env.PORT || 4000}`);
