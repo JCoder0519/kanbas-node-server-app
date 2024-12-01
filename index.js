@@ -13,6 +13,8 @@ import QuizRoutes from "./Kanbas/Quizzes/routes.js"
 import mongoose from "mongoose";
 import "dotenv/config";
 import QuestionsRoute from './Kanbas/QuizQuestions/routes.js';
+import QuizPreviewRoutes from './Kanbas/QuizPreview/routes.js';
+
 
 const CONNECTION_STRING = "mongodb://127.0.0.1:27017/kanbas-02-fa24";
 mongoose.connect(CONNECTION_STRING);
@@ -55,6 +57,10 @@ EnrollmentRoutes(app);
 ModuleRoutes(app);
 QuizRoutes(app);
 QuestionsRoute(app);
+QuizPreviewRoutes(app);
+
+
+
 Lab5(app);
 Hello(app)
 app.listen(process.env.PORT || 4000);

@@ -17,6 +17,7 @@ export default function QuestionsRoute(app) {
     });
 
     app.post("/api/quizzes/:quizId/questions", async (req, res) => {
+        
         const { quizId } = req.params;
         const question = {
             ...req.body,
@@ -29,7 +30,9 @@ export default function QuestionsRoute(app) {
     app.get("/api/quizzes/:quizId/questions", async (req, res) => {
         const { quizId } = req.params;
         const questions = await questionsDao.findQuestionsForQuiz(quizId);
-        res.json(questions);
+        console.log("Questions for quiz:", quizId, questions); // Log fetched questions
+        res.json({ questions });
     });
+    
 
 }
