@@ -1,31 +1,20 @@
-// EnrollmentRoutes.js
-import * as dao from "./dao.js"; // Enrollment DAO
+import * as enrollmentsDao from "./dao.js";
 
-export default function EnrollmentRoutes(app) {
-  // Enroll a user in a course
-  app.post("/api/enrollments", (req, res) => {
-    const enrollment = dao.createEnrollment(req.body);
-    res.send(enrollment);
-  });
+export default function enrollUserInCourse(app) {
+    app.post("/api/enrollments/:userId/:courseId", (req, res) => {
+        const { userId, courseId } = req.params;
+        const enrollments = enrollmentsDao.enrollUserInCourse(userId, courseId);
+        res.json(enrollments);
+    });
 
-  // Unenroll a user from a course
-  app.delete("/api/enrollments/:enrollmentId", (req, res) => {
-    const { enrollmentId } = req.params;
-    dao.deleteEnrollment(enrollmentId);
-    res.sendStatus(200);
-  });
+    app.delete("/api/enrollments/:userId/:courseId", (req, res) => {
+        const { userId, courseId } = req.params;
+        const enrollments = enrollmentsDao.unenrollUserInCourse(userId, courseId);
+        res.json(enrollments);
+    });
 
-  // Get enrollments for a user
-  app.get("/api/users/:userId/enrollments", (req, res) => {
-    const { userId } = req.params;
-    const enrollments = dao.findEnrollmentsForUser(userId);
-    res.send(enrollments);
-  });
-
-  // Check if a user is enrolled in a course
-  app.get("/api/enrollments", (req, res) => {
-    const { userId, courseId } = req.query;
-    const enrollment = dao.findEnrollment(userId, courseId);
-    res.send(enrollment ? enrollment : {});
-  });
-}
+    app.get("/api/enrollments", (req, res) => {
+        const enrollments = enrollmentsDao.findAllEnrollments()
+        res.json(enrollments)
+    })
+};
