@@ -72,3 +72,9 @@ export const updateQuestion = async (questionId, updates) => {
     throw error;
   }
 };
+
+
+export const deleteQuestion = async (id) => {
+  console.log("[DAO] Deleting question:", id);
+  return await QuestionModel.findByIdAndDelete(id);
+};
