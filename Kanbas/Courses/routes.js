@@ -40,13 +40,13 @@ export default function CourseRoutes(app) {
   });
 
   // Get users for course
-  app.get("/api/courses/:cid/users", async (req, res) => {
+  app.get("/api/courses/:courseId/users", async (req, res) => {
     try {
-      const { cid } = req.params;
-      if (!cid) {
+      const { courseId } = req.params;
+      if (!courseId) {
         return res.status(400).json({ error: "Course ID is required" });
       }
-      const users = await enrollmentsDao.findUsersForCourse(cid);
+      const users = await enrollmentsDao.findUsersForCourse(courseId);
       res.json(users);
     } catch (error) {
       console.error("Error finding users for course:", error);
