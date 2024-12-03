@@ -1,6 +1,4 @@
-// models/attemptModel.js
-
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const AttemptSchema = new mongoose.Schema({
   quizId: {
@@ -9,7 +7,7 @@ const AttemptSchema = new mongoose.Schema({
     required: true,
   },
   userId: {
-    type: String, // Adjust the type based on your user ID format
+    type: String, // Adjust based on your user ID type
     required: true,
   },
   answers: {
@@ -25,8 +23,12 @@ const AttemptSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  maxAttempts: {
+    type: Number,
+    default: 3, // Default to 3 attempts globally, adjust as needed
+  },
 });
 
 const AttemptModel = mongoose.model("Attempt", AttemptSchema);
 
-module.exports = AttemptModel;
+export default AttemptModel;
