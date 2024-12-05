@@ -5,36 +5,52 @@ export default function PreviewRoutes(app) {
   // Fetch Quiz Preview
   app.get("/api/quizzes/:quizId/preview", async (req, res) => {
     try {
-      const { quizId } = req.params;
+        const { quizId } = req.params;
 
-      if (!quizId) {
-        return res.status(400).json({ message: "Quiz ID is required" });
-      }
+        // Debug: Check if quizId is received
+        console.log(`[DEBUG] Received quizId: ${quizId}`);
 
-      const questions = await model.find({ quiz: quizId })
-        .select('_id title text question choices type points answers');
+        if (!quizId) {
+            console.error("[DEBUG] Missing quizId in request parameters");
+            return res.status(400).json({ message: "Quiz ID is required" });
+        }
 
-      if (!questions?.length) {
-        return res.status(404).json({ message: "No questions found for this quiz" });
-      }
+        // Fetch questions from the database
+        const questions = await model.find({ quiz: quizId })
+            .select('_id title text question choices type points answers');
 
-      const formattedQuestions = questions.map(q => ({
-        _id: q._id.toString(),
-        title: q.title || 'Untitled Question',
-        question: q.text || q.question,
-        choices: q.choices || [],
-        type: q.type,
-        points: q.points,
-        answers: q.answers
-      }));
+        // Debug: Log raw questions from the database
+        console.log("[DEBUG] Raw Questions from Database:", JSON.stringify(questions, null, 2));
 
-      res.json({ questions: formattedQuestions });
+        if (!questions?.length) {
+            console.warn(`[DEBUG] No questions found for quizId: ${quizId}`);
+            return res.status(404).json({ message: "No questions found for this quiz" });
+        }
+
+        // Format the questions
+        const formattedQuestions = questions.map(q => ({
+            _id: q._id.toString(),
+            title: q.title || 'Untitled Question',
+            question: q.text || q.question || 'No question text provided',
+            choices: Array.isArray(q.choices) ? q.choices : [],
+            type: q.type || 'Multiple Choice',
+            points: q.points || 0,
+            answers: Array.isArray(q.answers) ? q.answers : [] // Validate `answers` is an array
+        }));
+
+        // Debug: Log formatted questions
+        console.log("[DEBUG] Formatted Questions to be Sent:", JSON.stringify(formattedQuestions, null, 2));
+
+        res.json({ questions: formattedQuestions });
     } catch (error) {
-      console.error("Error in quiz preview:", error);
-      res.status(500).json({ message: "Server error while fetching quiz preview" });
+        // Debug: Log the error stack trace
+        console.error("[DEBUG] Error in /api/quizzes/:quizId/preview:", error);
+        res.status(500).json({ message: "Server error while fetching quiz preview" });
     }
-  });
+});
 
+
+  
   // Fetch Previous Attempts - Fixed route
   // In routes.js
   app.get("/api/quizzes/:quizId/preview/attempts", async (req, res) => {

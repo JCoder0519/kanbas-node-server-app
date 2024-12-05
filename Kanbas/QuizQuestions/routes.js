@@ -58,34 +58,39 @@ export default function QuestionsRoute(app) {
 
 
     app.get("/api/quizzes/:quizId/preview", async (req, res) => {
-        try {
+      try {
           const { quizId } = req.params;
           console.log("[DEBUG] Fetching quiz preview for quizId:", quizId);
-      
+  
+          // Fetch questions for the quiz
           const questions = await questionsDao.findQuestionsForQuiz(quizId);
-          
-          // Transform questions to include type and ensure all required fields
+          console.log("[DEBUG] Raw Questions from Database:", JSON.stringify(questions, null, 2));
+  
+          // Transform questions to include required fields
           const transformedQuestions = questions.map(question => ({
-            _id: question._id,
-            title: question.title || '',
-            question: question.question || '',
-            choices: question.choices || [],
-            type: question.type || 'Multiple Choice',  // Ensure type is always set
-            points: question.points || '0',
-            quiz: question.quiz
+              _id: question._id,
+              title: question.title || '',
+              question: question.question || '',
+              choices: question.choices || [],
+              type: question.type || 'Multiple Choice',  // Ensure type is always set
+              points: question.points || '0',
+              quiz: question.quiz,
+              answers: Array.isArray(question.answers) ? question.answers : [] // Include answers
           }));
-      
+  
+          // Log transformed questions
           console.log("[DEBUG] Sending transformed questions:", JSON.stringify(transformedQuestions, null, 2));
-      
+  
           res.json({ questions: transformedQuestions });
-        } catch (error) {
+      } catch (error) {
           console.error("[DEBUG] Error in quiz preview:", error);
           res.status(500).json({
-            error: "Failed to fetch quiz preview",
-            message: error.message
+              error: "Failed to fetch quiz preview",
+              message: error.message
           });
-        }
-      });
+      }
+  });
+  
     
    // Add route for updating a specific question
    app.put("/api/questions/:id", async (req, res) => {

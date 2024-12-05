@@ -18,7 +18,8 @@ export const findQuestionsForQuiz = async (quizId) => {
         choices: 1,
         type: 1,    // Make sure type is included
         points: 1,
-        quiz: 1
+        quiz: 1,
+        answers: 1  // Include answers FINALLLY DEBUGGED OUT THE ERROR，I WAS NOT INCLUDING ASNWERS IN THE QUERY
       }
     ).lean();
     
