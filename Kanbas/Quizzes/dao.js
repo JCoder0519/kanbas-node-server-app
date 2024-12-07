@@ -1,36 +1,42 @@
+// dao.js
 import model from "./model.js";
+import mongoose from "mongoose";
+
 
 export function findAllQuizzes() {
-  return model.find()
+    return model.find();
 }
+
+export function findQuizById(quizId) {
+  console.log("DAO findQuizById called with ID:", quizId);
+  try {
+      // Create a new ObjectId instance using 'new'
+      const objectId = new mongoose.Types.ObjectId(quizId);
+      console.log("Converted to ObjectId:", objectId);
+      return model.findById(objectId);
+  } catch (error) {
+      console.error("Error in findQuizById:", error);
+      throw error;
+  }
+}
+
 export function findQuizzesForCourse(courseId) {
-  // const { quizzes } = Database;
-  // const quizzesForCourse = quizzes.filter((quiz) =>
-  //   quiz.course === courseId);
-  // return quizzesForCourse;
-  return model.find({ course: courseId });
+    return model.find({ course: courseId });
 }
 
 export function createQuiz(quiz) {
-  // const newQuiz = { ...quiz, _id: Date.now().toString() };
-  // Database.quizzes = [...Database.quizzes, newQuiz];
-  // return newQuiz;
-  delete quiz._id
-  return model.create(quiz);
+    delete quiz._id;
+    return model.create(quiz);
 }
 
 export function deleteQuiz(quizId) {
-  // const { quizzes } = Database;
-  // Database.quizzes = quizzes.filter((quiz) => quiz._id !== quizId);
-  return model.deleteOne({ _id: quizId });
-
+    return model.deleteOne({ _id: quizId });
 }
 
 export function updateQuiz(quizId, quizUpdates) {
-  // const { quizzes } = Database;
-  // const quiz = quizzes.find((quiz) => quiz._id === quizId);
-  // Object.assign(quiz, quizUpdates);
-  // return quiz;
-  return model.findByIdAndUpdate({ _id: quizId }, quizUpdates, { new: true });
-
+    return model.findByIdAndUpdate(
+        { _id: quizId },
+        quizUpdates,
+        { new: true }
+    );
 }
