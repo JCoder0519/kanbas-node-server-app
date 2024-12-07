@@ -13,7 +13,7 @@ export default function QuizRoutes(app) {
 
       const attempts = await model.find({ quiz: quizId, user: userId })
         .sort({ attempt: -1 })
-        .select('attempt score submittedAt');
+        .select('attempt score submittedAt answers'); // Added answers to selection
 
       res.json(attempts);
     } catch (error) {
